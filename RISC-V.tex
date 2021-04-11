@@ -1,0 +1,100 @@
+\documentclass{article}
+
+
+\title{RISC-V Architecture and Programming}
+\author{Davide di Trocchio}
+
+\begin{document}
+    \maketitle
+    \newpage
+
+    \section{RISC-V Programming}
+    \subsection{Registers}
+    \subsubsection{Basic registers}
+    \textbf{Register rd, t1, t2 \qquad \qquad t[0] $\leftarrow$ t[1], t[2]}
+    \par
+    Basic form of registers. May vary slightly.\medbreak
+    
+    \textbf{add t0, t1, t2 \qquad \qquad t[0] $\leftarrow$ t[1] + t[2]}
+    \par
+    Adds t1 and t2 to t0. \medbreak
+
+    \textbf{addi t0, t0, integer \qquad \qquad t[0] $\leftarrow$ t[0] + integer}
+    \par
+    Adds an integer to a rd (t0). \medbreak
+
+    \textbf{sub t0, t1, t2 \qquad \qquad t[0] $\leftarrow$ t[1] - t[2]}
+    \par
+    Subtracts t1 and t2 to t0. \medbreak
+
+    \subsubsection{Variables, Special Registers}
+    Registers in forms of "zero" and such.
+
+    \textbf{zero}
+    \par
+    Shorthand for zero value. Cannot be used in mov instruction. Check why later
+    \underline{ex.} add t2, t1, zero
+
+    \textbf{}
+
+    \subsection{Branching}
+    Branch and jump on labels on different conditions. It follows a "format B" of bits,
+    not like other registers we discussed earlier. Its format has rs1, rs2 and f3 like
+    other popular registers, but it has two "c" parts of 5 and 7 bits each which act as
+    counters to add up to the program counter. However, this counter can be interpreted
+    by a label by the RARS compiler. :\medbreak
+    \textbf{beq t1, t2, c(label)}
+    \par "Branch If Equal", if t1 == t2, jump to label. \medbreak
+
+    \textbf{bne t1, t2, c(label)}
+    \par "Branch If Not Equal", if t1 != t2, jump to label. 
+
+    \subsection{Loading and Saving}
+    \par Loading and saving words in memory.\medbreak
+    \textbf{lui t0, c}
+    \par "Load Upper Immediate" loads in the upmost part of register c and
+    puts 0 in all the rest. Results in 0xc0000. Loads 20 bits before.\medbreak
+
+    \textbf{ori t1, t2, c}
+    \par "OR Immediate" Puts in t1 the OR between t2 and c. It's a
+    bit for bit OR and puts the result in the right hand side of the register.
+    Loads 12 bits. Can be useful to put an ori and a lui to create a full custom
+    bit. \medbreak
+
+    \textbf{lw t0, c(t1) \qquad t0 $\leftarrow$ M[t1 + c]}
+    \par "Load Word" loads a word from the memory. It loads an address saved in 
+    memory t1, with offset c. \medbreak 
+
+    \textbf{sw t0, c(t1) \qquad M[t1 + c] $\leftarrow$ t0 }
+    \par "Save Word" saves a word in memory at offset t1+c. Uses s-type format,
+    which consists of offset, rs1, f3 and an opcode.
+
+    \subsection{Registers construction}
+    First seven bits are used for the \textbf{opcode}.\newline
+    The \textbf{opcode} tells the basic operation of the instruction.\newline
+    The \textbf{rd} (Register destination) gets the result of the operand. 
+        In this case, it is t0.\newline
+    The \textbf{funct3} selects a specific variant of the current operation.\newline
+    The \textbf{funct7} Still to define. May occupy a bigger space to create immediate
+    instructions. May contain jump instructions or general branching. \newline
+    The \textbf{rs1} (Register source) is the first operand of the two registers.\newline
+    The \textbf{rs2} (Register source 2 ) is same as before. They both take the same
+        number of bits\newline
+    This generates a very large binary string which is generally provided.
+    Coded inside a map using a word (31, 0 bits).
+
+    \subsection{Putting it all together.}
+    \par \textbf{1.} Write a RARS program which takes in all numbers from 1 to 10 and stores them.
+    Something like:  t0 $\leftarrow$ 1+2+3+4+5+6+7+8+9+10. \smallbreak
+    My solution: \smallbreak
+    addi t3, t3, 11\smallbreak
+    add t2, zero, zero\smallbreak
+
+    loop:\smallbreak
+        \qquad add t1, t1, t2\smallbreak
+        \qquad addi t2, t2, 1\smallbreak
+        \qquad bne  t2, t3, loop\smallbreak
+    \par All of this outputs 0x0000002d, which is 45, being the n-th triangular
+    sum of 9.
+
+\end{document}
