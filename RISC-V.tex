@@ -27,15 +27,57 @@
     \par
     Subtracts t1 and t2 to t0. \medbreak
 
+    \textbf{and t2, t1, t0}  \smallbreak
+    Performs an AND operation between t1 and t0.\smallbreak
+    \textbf{or t2, t1, t0}   \smallbreak
+    Performs an OR operation between t1 and t0.\smallbreak
+    \textbf{xor t2, t1, t0}  \smallbreak
+    Performs a XOR operation between t1 and t0.\smallbreak
+    f7, rs2, rs1, f3, rd, opcode. They have a slightly different type of 
+    construction called \textbf{R-Type}. Ther is no NOT in the instruction set. 
+    This is because we can build a not by simply writing a xor between a register 
+    and a 0xffff type of instruction.\medbreak
+
+    
+    \textbf{andi t3, t0, 4}  \smallbreak
+    Performs an ANDI operation between t0 and 4, puts 4 in the immediate part
+    of t3.\smallbreak
+    \textbf{ori t3, t0, 4}   \smallbreak
+    Performs a ORI operation between t0 and 4, puts 4 in the immediate part
+    of t3.\smallbreak
+    \textbf{xori t3, t0, 4}  \smallbreak
+    Performs a XORi operation between t0 and 4, puts 4 in the immediate part
+    of t3.\smallbreak
+
+    immediate, rs1, f3, rd, opcode. Their construction is called \textbf{I-type}.
+    This is because the number passed as an argument is put in the upper part of 
+    the register. 
+
     \subsubsection{Variables, Special Registers}
     Registers in forms of "zero" and such.
 
     \textbf{zero}
     \par
     Shorthand for zero value. Cannot be used in mov instruction. Check why later
-    \underline{ex.} add t2, t1, zero
+    \underline{ex.} add t2, t1, zero \medbreak
 
-    \textbf{}
+    \textbf{.word integer}
+    \par Create a word (variable) and assign value integer. Each number put 
+    takes 4 byte and are being put in memory at the same location. Multiple 
+    numbers can be put inside the \textit{.word} clause. Should always start
+    at 0x10010000.\medbreak
+
+    \textbf{.string "Hello"}
+    \par Puts in memory a string of characters. Each character takes 1 byte plus 
+    a special character which terminates the string.\medbreak 
+
+    \textbf{.text}
+    \par Simple label where we can put piece of code afterwards. Doesn't define 
+    a variable and starts at memory location 0x00400000. \medbreak
+
+
+
+
 
     \subsection{Branching}
     Branch and jump on labels on different conditions. It follows a "format B" of bits,
@@ -67,7 +109,35 @@
 
     \textbf{sw t0, c(t1) \qquad M[t1 + c] $\leftarrow$ t0 }
     \par "Save Word" saves a word in memory at offset t1+c. Uses s-type format,
-    which consists of offset, rs1, f3 and an opcode.
+    which consists of offset, rs1, f3 and an opcode. \medbreak
+
+
+    \subsection{Function calls}
+    Function calls to the operating system.\smallbreak 
+    \textbf{ecall}
+    \par "Exception call" are calls to specific system calls. There are some
+    special registers used for system calls, like \textbf{a7}. Every other register
+    is used for other function calls. They would be all registers from \textbf{a0 to a6}.
+    Two are most used. \smallbreak
+    \textbf{1} is used to print an integer.\smallbreak
+    \textbf{4} is used to print a string. \smallbreak
+    \textbf{10} is used to exit. Every program at the end must use this system call.
+    In c, this is appended as \textit{return 0}. In more modern languages this is done
+    automatically.  \smallbreak
+    Also several other can be used to do other kind of stuff. But how can one use it?
+    \smallbreak
+    \textbf{An example: }\smallbreak
+    .data\smallbreak
+    \qquad .string "Hello world!"\smallbreak
+    .text\smallbreak
+    \qquad lui a0, 0x10010\smallbreak
+    \qquad addi a7, zero, 4\smallbreak
+    \qquad ecall\smallbreak
+    \qquad addi a7, zero, 10\smallbreak
+    \qquad ecall \smallbreak
+    Ecalls are always present after adding an integer to the system call variables.
+    (In this case we are looking at a7.)  
+
 
     \subsection{Registers construction}
     First seven bits are used for the \textbf{opcode}.\newline
@@ -83,10 +153,11 @@
     This generates a very large binary string which is generally provided.
     Coded inside a map using a word (31, 0 bits).
 
+
     \subsection{Putting it all together.}
     \par \textbf{1.} Write a RARS program which takes in all numbers from 1 to 10 and stores them.
     Something like:  t0 $\leftarrow$ 1+2+3+4+5+6+7+8+9+10. \smallbreak
-    My solution: \smallbreak
+    \textbf{My solution:} \smallbreak
     addi t3, t3, 11\smallbreak
     add t2, zero, zero\smallbreak
 
